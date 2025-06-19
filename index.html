@@ -1,1 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gym Bro</title>
+    <!-- Agrega meta viewport para móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #e8f5e9;
+            /* Elimina centrado y flex del body */
+            width: 100vw;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        body {
+            /* Elimina flex y centrado */
+            width: 100vw;
+            min-height: 100vh;
 
+            /* Haz la animación de fade-in más rápida */
+            opacity: 0;
+            transition: opacity 1.5s cubic-bezier(.77,0,.18,1);
+        }
+        body.fade-in {
+            opacity: 1;
+        }
+        .arbol-chan-container {
+            /* Haz que ocupe toda la pantalla y se fije */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('Fondo texto.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: auto;
+            /* Elimina max/min width/height */
+        }
+        .arbol-chan-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 92vw;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2.5vh 0 2.5vh 0;
+            /* Quitar fondo, borde y sombra */
+            background: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        /* Imagen baja desde arriba */
+        .arbol-chan-img {
+            width: 44vw;
+            max-width: 180px;
+            min-width: 90px;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transition: opacity 1.2s, transform 1.2s cubic-bezier(.77,0,.18,1);
+            transform: translateY(-120px);
+        }
+        .arbol-chan-img.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .arbol-chan-titulo {
+            font-family: 'Montserrat', Arial, sans-serif;
+            color: #178a2c;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.7rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+        }
+        .arbol-chan-texto {
+            color: #fff;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-size: 1.05rem;
+            margin-top: 0.3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 0 2px 8px #000;
+        }
+        .btn-continuar {
+            margin-top: 0.3rem;
+            font-size: 1.1rem;
+            background: #178a2c;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            padding: 0.6rem 2rem;
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+        }
+        .btn-continuar:active {
+            background: #176d13;
+            border: 2px solid #ffe44d;
+        }
+        /* Pong styles (copiados tal cual del flujo original) */
+        #pong-container {
+            width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: url('fonde mesa.jpg') no-repeat center center, linear-gradient(180deg, #e8f5e9 0%, #178a2c 100%);
+            background-size: cover;
+            position: fixed; top: 0; left: 0;
+        }
+        #pong-canvas {
+            background: transparent;
+            display: block;
+            margin: auto;
+            width: 92vw;
+            height: 70vh;
+            max-width: 370px;
+            max-height: 620px;
+            aspect-ratio: 9/16;
+            border-radius: 18px;
+            box-shadow: 0 0 32px 4px #178a2c88, 0 0 0 4px #178a2c;
+            touch-action: none;
+        }
+        #pong-end {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('Fondo texto.jpg') no-repeat center center;
+            background-size: cover;
+            color: #178a2c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        #pong-end .arbol-img {
+            width: 38vw;
+            max-width: 180px;
+            min-width: 90px;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 4px 16px #fff);
+        }
+        #pong-end h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: #178a2c;
+            text-align: center;
+            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+            margin-top: 0;
+        }
+        #pong-next-img {
+            width: 60vw;
+            max-width: 300px;
+            min-width: 120px;
+            height: 180px;
+            background: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px #178a2c33;
+        }
+        #pong-end button {
+            font-size: 1.3rem;
+            background: #178a2c;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            padding: 0.7rem 2.5rem;
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            cursor: pointer;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        #pong-end button:active {
+            background: #176d13;
+            border: 2px solid #ffe44d;
+        }
+        /* Estilos específicos para Flappy Touch */
+        #flappy-container {
+            width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: url('fonde mesa.jpg') no-repeat center center, linear-gradient(180deg, #e8f5e9 0%, #178a2c 100%);
+            background-size: cover;
+            position: fixed; top: 0; left: 0;
+        }
+        #flappy-canvas {
+            background: transparent;
+            display: block;
+            margin: auto;
+            width: 92vw;
+            height: 70vh;
+            max-width: 370px;
+            max-height: 620px;
+            aspect-ratio: 9/16;
+            border-radius: 18px;
+            box-shadow: 0 0 32px 4px #178a2c88, 0 0 0 4px #178a2c;
+            border: none;
+            touch-action: none;
+        }
+        #flappy-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('Fondo texto.jpg') no-repeat center center;
+            background-size: cover;
+            color: #178a2c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        #flappy-overlay .arbol-img {
+            width: 38vw;
+            max-width: 180px;
+            min-width: 90px;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 4px 16px #fff);
+        }
+        #flappy-overlay h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: #178a2c;
+            text-align: center;
+            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+            margin-top: 0;
+        }
+        #flappy-overlay .arbol-chan-titulo {
+            font-family: 'Montserrat', Arial, sans-serif;
+            color: #178a2c;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.7rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+        }
+        #flappy-overlay .arbol-chan-texto {
+            color: #fff;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-size: 1.05rem;
+            margin-top: 0.3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 0 2px 8px #000;
+        }
+        #flappy-overlay button, #flappy-overlay .btn-continuar {
+            font-size: 1.3rem;
+            background: #178a2c;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            padding: 0.7rem 2.5rem;
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            cursor: pointer;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        #flappy-overlay button:active, #flappy-overlay .btn-continuar:active {
+            background: #176d13;
+            border: 2px solid #ffe44d;
+        }
+        #flappy-countdown {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+        #flappy-countdown-num {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 4rem;
+            color: #ffe44d; /* Cambiado de blanco a amarillo */
+            text-shadow: 0 2px 16px #178a2c,0 0 12px #fff;
+        }
+        #ost-text {
+            position:fixed;bottom:18px;left:0;width:100vw;text-align:center;z-index:20;
+            font-family:'Montserrat',Arial,sans-serif;font-size:1.05rem;color:#fff;text-shadow:0 2px 8px #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="arbol-chan-container" id="arbol-chan-container">
+        <div class="arbol-chan-content">
+
+            <img src="gymbro.png" class="arbol-chan-img" id="arbol-chan-img" alt="Gym Bro" />
+            <div class="arbol-chan-titulo" id="arbol-chan-titulo">Gym Bro</div>
+            <div class="arbol-chan-texto" id="arbol-chan-texto">
+                Bro... Do you really think you can get the clue that easily?<br>
+                I've seen babies with more muscle mass.
+            </div>
+            <button class="btn-continuar" id="btn-continuar">Continue</button>
+        </div>
+    </div>
+    <script>
+        // Animación de entrada de Don Árbol
+        const arbolChanImg = document.getElementById('arbol-chan-img');
+        setTimeout(() => {
+            arbolChanImg.classList.add('visible');
+        }, 800);
+
+        // Elimina los fade-in para título, texto y botón
+        /*
+        setTimeout(() => {
+            document.getElementById('arbol-chan-titulo').classList.add('visible');
+        }, 1100);
+        setTimeout(() => {
+            document.getElementById('arbol-chan-texto').classList.add('visible');
+        }, 1300);
+        setTimeout(() => {
+            document.getElementById('btn-continuar').classList.add('visible');
+        }, 1500);
+        */
+
+        // Agrega la clase fade-in al cargar la página para el efecto lento
+        window.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('fade-in');
+        });
+
+        // Secuencia de diálogo y juego de ping pong
+        let arbolChanDialogStep = 0;
+        const arbolChanTexto = document.getElementById('arbol-chan-texto');
+        const btnContinuar = document.getElementById('btn-continuar');
+        btnContinuar.addEventListener('click', function() {
+            if (arbolChanDialogStep === 0) {
+                arbolChanTexto.innerHTML = "Prove you're a real Bro™. Hold these weights without breaking a sweat for as long as it takes.";
+                arbolChanDialogStep = 1;
+            } else {
+                // Reemplaza el juego Pong por Flappy Touch con estética visual del Pong
+                document.body.innerHTML = `
+                    <style>
+                        body {
+                            margin: 0;
+                            background: #e8f5e9;
+                            width: 100vw;
+                            min-height: 100vh;
+                            font-family: 'Montserrat', Arial, sans-serif;
+                        }
+                        #flappy-container {
+                            width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;
+                            background: url('fonde mesa.jpg') no-repeat center center, linear-gradient(180deg, #e8f5e9 0%, #178a2c 100%);
+                            background-size: cover;
+                            position: fixed; top: 0; left: 0;
+                        }
+                        #flappy-canvas {
+                            background: transparent;
+                            display: block;
+                            margin: auto;
+                            width: 92vw;
+                            height: 70vh;
+                            max-width: 370px;
+                            max-height: 620px;
+                            aspect-ratio: 9/16;
+                            border-radius: 18px;
+                            box-shadow: 0 0 32px 4px #178a2c88, 0 0 0 4px #178a2c;
+                            border: none;
+                            touch-action: none;
+                        }
+                        #flappy-overlay {
+                            position: absolute;
+                            top: 0; left: 0; width: 100vw; height: 100vh;
+                            background: url('Fondo texto.jpg') no-repeat center center;
+                            background-size: cover;
+                            color: #178a2c;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 10;
+                            font-family: 'Montserrat', Arial, sans-serif;
+                        }
+                        #flappy-overlay .arbol-img {
+                            width: 38vw;
+                            max-width: 180px;
+                            min-width: 90px;
+                            margin-top: 2.5rem;
+                            margin-bottom: 1.2rem;
+                            filter: drop-shadow(0 4px 16px #fff);
+                        }
+                        #flappy-overlay h2 {
+                            font-size: 2.2rem;
+                            margin-bottom: 2rem;
+                            color: #178a2c;
+                            text-align: center;
+                            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+                            margin-top: 0;
+                        }
+                        #flappy-overlay .arbol-chan-titulo {
+                            font-family: 'Montserrat', Arial, sans-serif;
+                            color: #178a2c;
+                            font-size: 2rem;
+                            font-weight: bold;
+                            margin-top: 0.7rem;
+                            margin-bottom: 0.5rem;
+                            text-align: center;
+                            text-shadow: 0 2px 12px #fff, 0 0 12px #178a2c, 2px 2px 0 #fff;
+                        }
+                        #flappy-overlay .arbol-chan-texto {
+                            color: #fff;
+                            font-family: 'Roboto', Arial, sans-serif;
+                            font-size: 1.05rem;
+                            margin-top: 0.3rem;
+                            margin-bottom: 1rem;
+                            text-align: center;
+                            text-shadow: 0 2px 8px #000;
+                        }
+                        #flappy-overlay button, #flappy-overlay .btn-continuar {
+                            font-size: 1.3rem;
+                            background: #178a2c;
+                            color: #fff;
+                            border: 2px solid #fff;
+                            border-radius: 8px;
+                            padding: 0.7rem 2.5rem;
+                            font-weight: bold;
+                            font-family: 'Montserrat', Arial, sans-serif;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+                            cursor: pointer;
+                            margin-top: 1.5rem;
+                            margin-bottom: 2rem;
+                        }
+                        #flappy-overlay button:active, #flappy-overlay .btn-continuar:active {
+                            background: #176d13;
+                            border: 2px solid #ffe44d;
+                        }
+                        #flappy-countdown {
+                            position: absolute;
+                            top: 0; left: 0; width: 100vw; height: 100vh;
+                            display: flex; align-items: center; justify-content: center;
+                            z-index: 20;
+                            pointer-events: none;
+                        }
+                        #flappy-countdown-num {
+                            font-family: 'Montserrat', Arial, sans-serif;
+                            font-size: 4rem;
+                            color: #ffe44d; /* Cambiado de blanco a amarillo */
+                            text-shadow: 0 2px 16px #178a2c,0 0 12px #fff;
+                        }
+                        #ost-text {
+                            position:fixed;bottom:18px;left:0;width:100vw;text-align:center;z-index:20;
+                            font-family:'Montserrat',Arial,sans-serif;font-size:1.05rem;color:#fff;text-shadow:0 2px 8px #000;
+                        }
+                    </style>
+                    <div id="flappy-container">
+                        <canvas id="flappy-canvas"></canvas>
+                        <div id="flappy-countdown">
+                            <span id="flappy-countdown-num">3</span>
+                        </div>
+                    </div>
+                    <div id="ost-text">
+                        Dr. Wily's Stage Theme 1 metal version - Megaman 2
+                    </div>
+                    <audio id="pong-audio" src="gymtime.mp3" loop></audio>
+                    <div id="flappy-overlay" style="display:none;"></div>
+                `;
+
+                // Flappy Touch game logic
+                setTimeout(() => {
+                    const canvas = document.getElementById('flappy-canvas');
+                    const ctx = canvas.getContext('2d');
+                    const overlay = document.getElementById('flappy-overlay');
+                    const countdownDiv = document.getElementById('flappy-countdown');
+                    const countdownNum = document.getElementById('flappy-countdown-num');
+                    const audio = document.getElementById('pong-audio');
+
+                    // Responsive canvas
+                    function resizeCanvas() {
+                        const rect = canvas.getBoundingClientRect();
+                        canvas.width = rect.width;
+                        canvas.height = rect.height;
+                    }
+                    resizeCanvas();
+                    window.addEventListener('resize', resizeCanvas);
+
+                    // Game variables
+                    let birdY, velocity, gameStarted, countdown, lastPhaseTime, animationStartTime, repetitions;
+                    let currentTargetIndex, currentOffset, time, gameTimer, gameTimerInterval;
+                    let inFinalMilliseconds, finalMilliseconds, activeBonuses, gameOver;
+                    const gravity = 0.25;
+                    function getGameSize() { return { w: canvas.width, h: canvas.height }; }
+                    function rel(val, axis) {
+                        const { w, h } = getGameSize();
+                        return axis === 'w' ? val * w : val * h;
+                    }
+                    const birdX = () => getGameSize().w / 2;
+                    const phaseOffsets = [rel(0.13, 'h'), rel(0.19, 'h'), rel(0.25, 'h'), rel(0.31, 'h')];
+                    const maxRepetitions = 5;
+                    let phaseAnimationActive = true;
+                    let topLineY = 0;
+                    let bottomLineY = 0;
+
+                    function resetGame() {
+                        birdY = getGameSize().h / 2;
+                        velocity = 0;
+                        gameStarted = false;
+                        countdown = 3;
+                        lastPhaseTime = 0;
+                        animationStartTime = null;
+                        repetitions = 0;
+                        currentTargetIndex = 0;
+                        currentOffset = phaseOffsets[0];
+                        time = 0;
+                        gameTimer = 30;
+                        inFinalMilliseconds = false;
+                        finalMilliseconds = 900;
+                        activeBonuses = [];
+                        gameOver = false;
+                        phaseAnimationActive = true;
+                        overlay.style.display = 'none';
+                        clearInterval(gameTimerInterval);
+                        startCountdown();
+                        update();
+                    }
+
+                    function updateTargetOffset() {
+                        const phaseDuration = 300;
+                        const nextTargetIndex = Math.min(Math.floor(time / phaseDuration), phaseOffsets.length - 1);
+                        if (nextTargetIndex !== currentTargetIndex) {
+                            currentTargetIndex = nextTargetIndex;
+                            lastPhaseTime = performance.now();
+                        }
+                    }
+
+                    function smoothOffset() {
+                        const target = phaseOffsets[currentTargetIndex];
+                        const progress = Math.min(time / 200, 1);
+                        const factor = 0.01 + progress * (0.05 - 0.01);
+                        currentOffset += (target - currentOffset) * factor;
+                        return currentOffset;
+                    }
+
+                    function drawBird() {
+                        // Usa la imagen "pesas1.png" en vez de dibujar las pesas con canvas
+                        const img = drawBird.pesasImg || (drawBird.pesasImg = new Image());
+                        if (!img.src) img.src = "pesas1.png";
+                        // Haz las pesas aún más grandes
+                        const w = rel(0.48, 'w'); // antes 0.38
+                        const h = rel(0.24, 'h'); // antes 0.19
+                        ctx.save();
+                        ctx.globalAlpha = 1;
+                        ctx.drawImage(img, birdX() - w / 2, birdY - h / 2, w, h);
+                        ctx.restore();
+                    }
+
+                    function drawBoundaries() {
+                        const now = performance.now();
+                        const baseOffset = smoothOffset();
+                        let offsetAnim = 0;
+                        if (currentTargetIndex === phaseOffsets.length - 1) {
+                            if (phaseAnimationActive) {
+                                const elapsed = (now - lastPhaseTime) / 1000;
+                                offsetAnim = Math.sin(elapsed * 2 * Math.PI / 10) * rel(0.16, 'h');
+                                if (elapsed >= 10) {
+                                    animationStartTime = now;
+                                    phaseAnimationActive = false;
+                                }
+                            } else if (repetitions < maxRepetitions) {
+                                const elapsed = (now - animationStartTime) / 1000;
+                                const cycleDuration = 10;
+                                const t = (elapsed % cycleDuration) / cycleDuration;
+                                if (elapsed >= (repetitions + 1) * cycleDuration) repetitions++;
+                                offsetAnim = Math.sin(t * 2 * Math.PI) * rel(0.16, 'h');
+                            }
+                        }
+                        topLineY = baseOffset + offsetAnim;
+                        bottomLineY = getGameSize().h - baseOffset + offsetAnim;
+
+                        // Relleno blanco opaco para TODO el rectángulo verde (canvas)
+                        ctx.save();
+                        ctx.fillStyle = "#fff";
+                        ctx.globalAlpha = 1;
+                        ctx.fillRect(0, 0, getGameSize().w, getGameSize().h);
+                        ctx.restore();
+
+                        // Líneas rojo neón
+                        ctx.save();
+                        ctx.strokeStyle = '#ff1744'; // rojo neón
+                        ctx.lineWidth = rel(0.012, 'w');
+                        ctx.shadowColor = "#ff1744"; // neón
+                        ctx.shadowBlur = 16;
+                        ctx.beginPath();
+                        ctx.moveTo(rel(0.03, 'w'), topLineY);
+                        ctx.lineTo(getGameSize().w - rel(0.03, 'w'), topLineY);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(rel(0.03, 'w'), bottomLineY);
+                        ctx.lineTo(getGameSize().w - rel(0.03, 'w'), bottomLineY);
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+                        ctx.restore();
+                    }
+
+                    function checkCollision() {
+                        const halfHeight = rel(0.035, 'w');
+                        if (birdY - halfHeight < topLineY || birdY + halfHeight > bottomLineY) {
+                            showEndScreen(false);
+                        }
+                    }
+
+                    function drawCountdown() {
+                        ctx.fillStyle = '#ffe44d'; // amarillo
+                        ctx.font = `bold ${rel(0.13, 'w')}px 'Montserrat', Arial, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.shadowColor = "#178a2c";
+                        ctx.shadowBlur = 8;
+                        ctx.fillText(countdown, getGameSize().w / 2, getGameSize().h / 2);
+                        ctx.shadowBlur = 0;
+                    }
+
+                    function drawGameTimer() {
+                        if (!gameStarted) return;
+                        ctx.textAlign = 'center';
+                        const timerText = inFinalMilliseconds ? (finalMilliseconds / 1000).toFixed(1) + 's' : gameTimer + 's';
+                        ctx.fillStyle = '#178a2c'; // verde igual al de los títulos
+                        ctx.font = `bold ${rel(0.07, 'w')}px 'Montserrat', Arial, sans-serif`;
+                        ctx.shadowColor = "#178a2c";
+                        ctx.shadowBlur = 8;
+                        ctx.fillText(timerText, getGameSize().w / 2, rel(0.07, 'h'));
+                        ctx.shadowBlur = 0;
+                        activeBonuses = activeBonuses.filter(b => performance.now() - b.start < 1500);
+                        activeBonuses.forEach((b, index) => {
+                            const alpha = 1 - (performance.now() - b.start) / 1500;
+                            ctx.globalAlpha = alpha;
+                            ctx.fillStyle = '#e53935'; // "+5" en rojo
+                            ctx.font = `bold ${rel(0.045, 'w')}px 'Montserrat', Arial, sans-serif`;
+                            const offsetX = rel(0.13, 'w') + index * rel(0.13, 'w') + 3;
+                            ctx.fillText('+5', getGameSize().w / 2 + offsetX, rel(0.07, 'h'));
+                            ctx.globalAlpha = 1;
+                        });
+                    }
+
+                    function update() {
+                        if (gameOver) return;
+                        ctx.clearRect(0, 0, getGameSize().w, getGameSize().h);
+                        if (!gameStarted) {
+                            updateTargetOffset();
+                            drawBoundaries();
+                            drawBird();
+                            drawCountdown();
+                            time++;
+                            requestAnimationFrame(update);
+                            return;
+                        }
+                        velocity += gravity * rel(1, 'h') / 480;
+                        birdY += velocity;
+                        if (birdY > getGameSize().h) birdY = getGameSize().h;
+                        if (birdY < 0) {
+                            birdY = 0;
+                            velocity = 0;
+                        }
+                        updateTargetOffset();
+                        drawBoundaries();
+                        drawBird();
+                        drawGameTimer();
+                        checkCollision();
+                        time++;
+                        requestAnimationFrame(update);
+                    }
+
+                    function flap() {
+                        if (!gameStarted || gameOver) return;
+                        velocity = -5.4 * rel(1, 'h') / 480;
+                    }
+
+                    function startGameTimer() {
+                        let bonusGiven = 0;
+                        gameTimerInterval = setInterval(() => {
+                            if (inFinalMilliseconds) {
+                                finalMilliseconds -= 100;
+                                if (finalMilliseconds <= 0) {
+                                    clearInterval(gameTimerInterval);
+                                    showEndScreen(true);
+                                }
+                                return;
+                            }
+                            gameTimer--;
+                            if (gameTimer === 5 && bonusGiven < 3) {
+                                gameTimer += 5;
+                                bonusGiven++;
+                                activeBonuses.push({ start: performance.now() });
+                            }
+                            if (gameTimer === 1 && bonusGiven >= 3) inFinalMilliseconds = true;
+                            if (gameTimer <= 0) {
+                                clearInterval(gameTimerInterval);
+                                showEndScreen(true);
+                            }
+                        }, 1000);
+                    }
+
+                    function showEndScreen(playerWon) {
+                        gameOver = true;
+                        overlay.style.display = 'flex';
+                        if (playerWon) {
+                            overlay.innerHTML = `
+                                <div class="arbol-chan-content" style="background:none;box-shadow:none;">
+                                    <img src="gymbro.png" class="arbol-chan-img" alt="Gym Bro" style="opacity:1;transform:none;margin-bottom:0.7rem;" />
+                                    <div class="arbol-chan-titulo" style="color:#178a2c;margin-bottom:0.7rem;">Gym Bro</div>
+                                    <div class="arbol-chan-texto" style="color:#fff;">
+                                        Bro... respect. You did all that without a single gram of pre-workout.<br>
+                                        You are, without a doubt, a real Bro™.
+                                    </div>
+                                    <button id="flappy-show-clue" class="btn-continuar" style="margin-top:1.2rem;">See clue</button>
+                                </div>
+                            `;
+                            document.getElementById('flappy-show-clue').onclick = function() {
+                                overlay.innerHTML = `
+                                    <h2 style="margin-top:0;">Next clue</h2>
+                                    <div id="pong-next-img" style="margin:0; padding:0;">
+                                        <img src="silla1.jpeg" alt="Clue" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;">
+                                    </div>
+                                    <button id="flappy-continue" style="font-size:1.3rem;background:#178a2c;color:#fff;border:2px solid #fff;border-radius:8px;padding:0.7rem 2.5rem;font-weight:bold;font-family:'Montserrat',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;margin-top:1.5rem;margin-bottom:2rem;">Continue</button>
+                                `;
+                                document.getElementById('flappy-continue').onclick = function() {
+                                    window.location.href = "https://danjua77.github.io/Sagrado.Puzzle/";
+                                };
+                            };
+                        } else {
+                            overlay.innerHTML = `
+                                <img src="gymbro.png" class="arbol-img" alt="Gym Bro" />
+                                <h2>Bro....</h2>
+                                <button id="flappy-retry">Continue</button>
+                            `;
+                            document.getElementById('flappy-retry').onclick = function() {
+                                resetGame();
+                            };
+                        }
+                    }
+
+                    function startCountdown() {
+                        countdownNum.textContent = countdown > 0 ? countdown : "";
+                        countdownDiv.style.display = 'flex';
+                        if (audio) {
+                            audio.currentTime = 0;
+                            audio.play().catch(()=>{});
+                        }
+                        const countdownInterval = setInterval(() => {
+                            countdown--;
+                            countdownNum.textContent = countdown > 0 ? countdown : "";
+                            if (countdown === 0) {
+                                clearInterval(countdownInterval);
+                                countdownDiv.style.display = 'none';
+                                gameStarted = true;
+                                startGameTimer();
+                            }
+                        }, 1000);
+                    }
+
+                    document.body.addEventListener('touchstart', flap);
+                    document.body.addEventListener('mousedown', flap);
+
+                    resetGame();
+                }, 10);
+            }
+        });
+    </script>
+</body>
+</html>
