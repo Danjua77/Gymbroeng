@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Gym Bro</title>
@@ -365,10 +365,10 @@
         const btnContinuar = document.getElementById('btn-continuar');
         btnContinuar.addEventListener('click', function() {
             if (arbolChanDialogStep === 0) {
-                arbolChanTexto.innerHTML = "Prove that you are a real Bro™. Hold these weights without breaking a sweat for as long as necessary.";
+                arbolChanTexto.innerHTML = "Prove you're a real Bro™. Hold these weights without breaking a sweat for as long as it takes.";
                 arbolChanDialogStep = 1;
             } else {
-                // Reemplaza el juego Pong por Flappy Touch con estética visual del Pong
+                // Replace Pong game with Flappy Touch with Pong visual style
                 document.body.innerHTML = `
                     <style>
                         body {
@@ -782,7 +782,7 @@
                                 };
                             };
                         } else {
-                            clearInterval(gameTimerInterval); // Detener el contador al perder
+                            clearInterval(gameTimerInterval); // Stop timer on lose
                             overlay.innerHTML = `
                                 <img src="parrishgym.png" class="arbol-img" alt="Gym Bro" />
                                 <h2>Bro....</h2>
