@@ -365,10 +365,10 @@
         const btnContinuar = document.getElementById('btn-continuar');
         btnContinuar.addEventListener('click', function() {
             if (arbolChanDialogStep === 0) {
-                arbolChanTexto.innerHTML = "Prove you're a real Bro™. Hold these weights without breaking a sweat for as long as it takes.";
+                arbolChanTexto.innerHTML = "Prove you're a real Bro™. Hold these weights without breaking a sweat for as long as necessary.";
                 arbolChanDialogStep = 1;
             } else {
-                // Replace Pong game with Flappy Touch with Pong visual style
+                // Reemplaza el juego Pong por Flappy Touch con estética visual del Pong
                 document.body.innerHTML = `
                     <style>
                         body {
@@ -757,7 +757,14 @@
                     function showEndScreen(playerWon) {
                         gameOver = true;
                         overlay.style.display = 'flex';
+                        if (audio) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                        }
                         if (playerWon) {
+                            // Reproducir ok.mp3 al ganar
+                            const okAudio = new Audio('ok.mp3');
+                            okAudio.play().catch(()=>{});
                             overlay.innerHTML = `
                                 <div class="arbol-chan-content" style="background:none;box-shadow:none;">
                                     <img src="gymbro.png" class="arbol-chan-img" alt="Gym Bro" style="opacity:1;transform:none;margin-bottom:0.7rem;" />
@@ -782,7 +789,7 @@
                                 };
                             };
                         } else {
-                            clearInterval(gameTimerInterval); // Stop timer on lose
+                            clearInterval(gameTimerInterval); // Detener el contador al perder
                             overlay.innerHTML = `
                                 <img src="parrishgym.png" class="arbol-img" alt="Gym Bro" />
                                 <h2>Bro....</h2>
