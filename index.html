@@ -762,7 +762,7 @@
                             audio.currentTime = 0;
                         }
                         if (playerWon) {
-                            // Reproducir ok.mp3 al ganar
+                            // Reproducir ok.mp3 al ganar (apenas gana)
                             const okAudio = new Audio('ok.mp3');
                             okAudio.play().catch(()=>{});
                             overlay.innerHTML = `
